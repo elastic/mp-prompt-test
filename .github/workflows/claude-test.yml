@@ -1,30 +1,26 @@
-name: Claude Mention (Issue)
+name: Claude Issue Triage
 on:
   issue_comment:
     types: [created]
 
 permissions:
-  contents: write
+  contents: read
   issues: write
   pull-requests: read
   id-token: write
 
 jobs:
-  respond:
+  triage:
     concurrency:
-      group: claude-mention-issue-${{ github.event.issue.number }}-${{ github.event.comment.id }}
+      group: claude-triage-${{ github.event.issue.number }}
     runs-on: ubuntu-latest
-    if: |
-      contains(github.event.comment.body, '@claude') &&
-      github.event.issue.pull_request == null &&
-      contains(fromJSON('["cachedout"]'), github.actor)
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Run Claude Mention Handler
-        uses: elastic/ai-github-actions/workflows/mention-in-issue/rwxp@v0
+      - name: Run Claude Issue Triage
+        uses: elastic/ai-github-actions/workflows/issue-triage/ro@v0
         with:
-          claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          claude-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
